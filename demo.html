@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI文物活化师 — 让沉睡的文物动起来</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        :root {
+            --gold: #C9A96E;
+            --gold-light: #E8D5A8;
+            --dark: #1A1A1A;
+            --darker: #111111;
+            --text: #E8E0D0;
+            --text-muted: #9A9080;
+            --red: #8B2500;
+            --card-bg: rgba(40, 35, 28, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(201, 169, 110, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(139, 37, 0, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #0d0b08 0%, #1a1510 50%, #0d0b08 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A96E' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(201, 169, 110, 0.1);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(40px, 8vw, 80px);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold) 0%, #fff 30%, var(--gold) 60%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-sub {
+            font-size: clamp(16px, 3vw, 22px);
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 600px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-sub strong {
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: rgba(201, 169, 110, 0.08);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            color: var(--gold-light);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: var(--text-muted);
+            font-size: 12px;
+            letter-spacing: 2px;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 80px 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(28px, 5vw, 40px);
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            margin-top: 8px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 700px;
+            margin-bottom: 50px;
+        }
+
+        /* Demo Video Section */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .demo-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(201, 169, 110, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(201, 169, 110, 0.4);
+        }
+
+        .demo-card video {
+            width: 100%;
+            display: block;
+            background: #000;
+        }
+
+        .demo-card-info {
+            padding: 24px;
+        }
+
+        .demo-card-label {
+            font-size: 12px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .demo-card-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .demo-card-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .meta-item span {
+            color: var(--text);
+        }
+
+        .prompt-box {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-family: 'Noto Sans SC', monospace;
+        }
+
+        .prompt-box code {
+            color: var(--gold-light);
+        }
+
+        /* Workflow Section */
+        .workflow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .workflow-step {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .workflow-step:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 20px;
+        }
+
+        .step-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Styles Section */
+        .styles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .style-card {
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .style-card:hover {
+            border-color: var(--gold);
+        }
+
+        .style-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .style-name {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .style-scene {
+            font-size: 13px;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .style-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Comparison Table */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        .compare-table th, .compare-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+        }
+
+        .compare-table th {
+            font-family: 'Noto Serif SC', serif;
+            color: var(--gold);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .compare-table td:first-child {
+            color: var(--text-muted);
+            font-size: 14px;
+            width: 120px;
+        }
+
+        .compare-table .old {
+            color: var(--text-muted);
+            text-decoration: line-through;
+            text-decoration-color: var(--red);
+            opacity: 0.6;
+        }
+
+        .compare-table .new {
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
+        /* API Section */
+        .api-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .api-card {
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .api-name {
+            font-family: monospace;
+            font-size: 18px;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .api-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .api-use {
+            font-size: 13px;
+            padding: 4px 12px;
+            background: rgba(201, 169, 110, 0.1);
+            border-radius: 20px;
+            color: var(--gold-light);
+            display: inline-block;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .code-header {
+            padding: 12px 20px;
+            background: rgba(201, 169, 110, 0.05);
+            border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-block pre {
+            padding: 20px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.7;
+            color: var(--text-muted);
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .code-block .keyword { color: #c678dd; }
+        .code-block .string { color: #98c379; }
+        .code-block .func { color: #61afef; }
+        .code-block .comment { color: #5c6370; font-style: italic; }
+
+        /* Scenarios */
+        .scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .scenario-card {
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid rgba(201, 169, 110, 0.1);
+        }
+
+        .scenario-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .scenario-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .scenario-list {
+            list-style: none;
+            font-size: 14px;
+        }
+
+        .scenario-list li {
+            padding: 4px 0;
+            color: var(--text-muted);
+        }
+
+        .scenario-list li::before {
+            content: '·';
+            color: var(--gold);
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(ellipse at 50% 50%, rgba(201, 169, 110, 0.05) 0%, transparent 70%);
+        }
+
+        .cta-quote {
+            font-family: 'Noto Serif SC', serif;
+            font-size: clamp(24px, 4vw, 36px);
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-desc {
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(201, 169, 110, 0.1);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        /* Divider */
+        .divider {
+            max-width: 1100px;
+            margin: 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.2), transparent);
+        }
+
+        /* Verification Box */
+        .verify-box {
+            padding: 20px 24px;
+            background: rgba(201, 169, 110, 0.05);
+            border: 1px solid rgba(201, 169, 110, 0.15);
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .verify-box h4 {
+            font-size: 14px;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .verify-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .verify-box code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--gold-light);
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .demo-grid { grid-template-columns: 1fr; }
+            .workflow-step:not(:last-child)::after { display: none; }
+            section { padding: 50px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-badge">Wan 2.7 API × 文化遗产活化</div>
+    <h1>AI文物活化师</h1>
+    <p class="hero-sub">
+        基于<strong>通义万相 Wan 2.7</strong> 的文化遗产动态影像生成Skill<br>
+        让每一件沉睡的文物，都被AI唤醒
+    </p>
+    <div class="hero-tags">
+        <span class="tag">wan2.7-t2v 文生视频</span>
+        <span class="tag">wan2.7-i2v 图生视频</span>
+        <span class="tag">wan2.7-i2i 图生图</span>
+        <span class="tag">5大活化风格</span>
+        <span class="tag">一键批量生成</span>
+    </div>
+    <div class="scroll-hint">↓ 向下滚动查看演示</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Demo Videos -->
+<section>
+    <h2 class="section-title">万相模型实际生成演示</h2>
+    <p class="section-desc">以下视频均由万相 Wan 2.7 文生视频模型（wan2.7-t2v）实时生成，无任何后期编辑。</p>
+
+    <div class="demo-grid">
+        <!-- Video 1: Bronze -->
+        <div class="demo-card">
+            <video controls preload="metadata" poster="">
+                <source src="relic-bronze-ding.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+            <div class="demo-card-info">
+                <div class="demo-card-label">万相 WAN2.7-T2V 生成</div>
+                <h3 class="demo-card-title">商代青铜鼎 · 奇幻穿越风</h3>
+                <div class="demo-card-meta">
+                    <div class="meta-item">模型: <span>wan2.7-t2v</span></div>
+                    <div class="meta-item">时长: <span>5秒</span></div>
+                    <div class="meta-item">分辨率: <span>720P</span></div>
+                    <div class="meta-item">耗时: <span>~2分40秒</span></div>
+                </div>
+                <div class="prompt-box">
+                    <strong style="color: var(--gold); font-size: 12px;">PROMPT</strong><br>
+                    Ancient Chinese bronze ritual tripod ding vessel from Shang dynasty, green patina gradually transforming to reveal original golden luster, magical golden particles swirling around the vessel, ethereal glow emanating from within, cinematic documentary style, slow motion, museum spotlight...
+                </div>
+            </div>
+        </div>
+
+        <!-- Video 2: Ru Ware -->
+        <div class="demo-card">
+            <video controls preload="metadata" poster="">
+                <source src="relic-ru-ware.mp4" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+            <div class="demo-card-info">
+                <div class="demo-card-label">万相 WAN2.7-T2V 生成</div>
+                <h3 class="demo-card-title">北宋汝窑天青釉 · 奇幻穿越风</h3>
+                <div class="demo-card-meta">
+                    <div class="meta-item">模型: <span>wan2.7-t2v</span></div>
+                    <div class="meta-item">时长: <span>5秒</span></div>
+                    <div class="meta-item">分辨率: <span>720P</span></div>
+                    <div class="meta-item">耗时: <span>~9分钟</span></div>
+                </div>
+                <div class="prompt-box">
+                    <strong style="color: var(--gold); font-size: 12px;">PROMPT</strong><br>
+                    Song dynasty Ru ware celadon vase, sky-blue glaze with fine crackle pattern, displayed on a clean museum pedestal, soft rotating spotlight illuminating the vase, magical awakening animation, golden particles swirling around the vase, ethereal blue glow emanating from within...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="verify-box">
+        <h4>🔍 百炼平台验证</h4>
+        <p>
+            评委可通过阿里云百炼平台验证生成记录：<br>
+            青铜器视频 Task ID: <code>e8183361-2aab-4804-a507-4961b518ba1b</code><br>
+            汝窑瓷器视频 Task ID: <code>79cd184e-2d9e-4d0a-a3c7-7a7782ded594</code><br>
+            API Key 用户ID: <code>4323202</code><br>
+            验证方式：登录 <strong>百炼控制台</strong> → 任务记录 → 输入Task ID查询
+        </p>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- How it works -->
+<section>
+    <h2 class="section-title">使用流程</h2>
+    <p class="section-desc">三步完成文物活化，零门槛上手</p>
+
+    <div class="workflow">
+        <div class="workflow-step">
+            <div class="step-icon">📷</div>
+            <div class="step-title">上传文物照片</div>
+            <div class="step-desc">提供文物图片或输入文字描述</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-icon">🎨</div>
+            <div class="step-title">选择活化风格</div>
+            <div class="step-desc">5大预设风格 + 自定义Prompt</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-icon">🚀</div>
+            <div class="step-title">生成活化视频</div>
+            <div class="step-desc">Wan2.7 API 自动生成动态视频</div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-icon">📤</div>
+            <div class="step-title">直接使用</div>
+            <div class="step-desc">展览、宣传、教育一键分发</div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 5 Styles -->
+<section>
+    <h2 class="section-title">五大活化风格</h2>
+    <p class="section-desc">针对不同场景精心设计的视频风格预设</p>
+
+    <div class="styles-grid">
+        <div class="style-card">
+            <div class="style-icon">🎬</div>
+            <div class="style-name">纪录片风</div>
+            <div class="style-scene">博物馆展厅 · 纪录片配图</div>
+            <div class="style-desc">专业拍摄感，博物馆灯光，慢镜头，浅景深</div>
+        </div>
+        <div class="style-card">
+            <div class="style-icon">🌀</div>
+            <div class="style-name">奇幻穿越风</div>
+            <div class="style-scene">社媒传播 · Z世代触达</div>
+            <div class="style-desc">文物从沉睡中"醒来"，金色粒子环绕，奇幻光效</div>
+        </div>
+        <div class="style-card">
+            <div class="style-icon">📜</div>
+            <div class="style-name">古代复原风</div>
+            <div class="style-scene">教育科普 · 历史还原</div>
+            <div class="style-desc">还原文物的制作场景和使用场景，历史准确</div>
+        </div>
+        <div class="style-card">
+            <div class="style-icon">✨</div>
+            <div class="style-name">粒子光效风</div>
+            <div class="style-scene">艺术展览 · 视觉冲击</div>
+            <div class="style-desc">金色粒子飞舞，光轨环绕，发光蜕变效果</div>
+        </div>
+        <div class="style-card">
+            <div class="style-icon">🏺</div>
+            <div class="style-name">博物馆展示风</div>
+            <div class="style-scene">官方宣传 · 正式场合</div>
+            <div class="style-desc">顶级博物馆展厅效果，旋转聚光灯，4K画质</div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Tech Architecture -->
+<section>
+    <h2 class="section-title">技术架构</h2>
+    <p class="section-desc">三大万相API能力，覆盖文物活化的全链路场景</p>
+
+    <div class="api-cards">
+        <div class="api-card">
+            <div class="api-name">wan2.7-i2v</div>
+            <div class="api-desc">图生视频 · 核心能力<br>文物照片 → 动态活化视频</div>
+            <span class="api-use">上传照片即可生成</span>
+        </div>
+        <div class="api-card">
+            <div class="api-name">wan2.7-t2v</div>
+            <div class="api-desc">文生视频 · 场景扩展<br>文字描述 → 历史场景还原</div>
+            <span class="api-use">本次演示使用的模型</span>
+        </div>
+        <div class="api-card">
+            <div class="api-name">wan2.7-i2i</div>
+            <div class="api-desc">图生图 · 辅助能力<br>文物风格化 / 色彩修复</div>
+            <span class="api-use">批量风格转换</span>
+        </div>
+    </div>
+
+    <div class="code-block">
+        <div class="code-header">
+            <span>Python · 快速开始</span>
+            <span style="color: var(--gold);">wanx_client.py</span>
+        </div>
+<pre><span class="keyword">from</span> main <span class="keyword">import</span> RelicActivator
+
+<span class="comment"># 初始化（使用阿里云百炼API Key）</span>
+activator = RelicActivator(api_key=<span class="string">"your_wan_api_key"</span>)
+
+<span class="comment"># 一键生成文物活化视频</span>
+result = activator.activate(
+    image_path=<span class="string">"./relics/bronze_ding.jpg"</span>,
+    style=<span class="string">"奇幻穿越风"</span>,
+    duration=<span class="func">10</span>,
+    description=<span class="string">"商代后母戊鼎，青铜礼器，饕餮纹饰"</span>
+)
+
+<span class="func">print</span>(f<span class="string">"视频URL: {result['video_url']}"</span>)
+<span class="func">print</span>(f<span class="string">"生成耗时: {result['duration']}秒"</span>)</pre>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Comparison -->
+<section>
+    <h2 class="section-title">效率对比</h2>
+    <p class="section-desc">AI文物活化师 vs 传统视频制作方式</p>
+
+    <table class="compare-table">
+        <thead>
+            <tr>
+                <th>对比维度</th>
+                <th>传统方式</th>
+                <th>AI文物活化师</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>制作周期</td>
+                <td class="old">1-4周</td>
+                <td class="new">5-10分钟</td>
+            </tr>
+            <tr>
+                <td>制作成本</td>
+                <td class="old">¥5,000-50,000/条</td>
+                <td class="new">¥1-5/条</td>
+            </tr>
+            <tr>
+                <td>所需技能</td>
+                <td class="old">摄影师+剪辑师+特效师</td>
+                <td class="new">上传照片，选风格</td>
+            </tr>
+            <tr>
+                <td>产出数量</td>
+                <td class="old">1-3条</td>
+                <td class="new">批量生成，无限变体</td>
+            </tr>
+            <tr>
+                <td>风格多样性</td>
+                <td class="old">受限于团队</td>
+                <td class="new">5大预设+无限自定义</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- Use Scenarios -->
+<section>
+    <h2 class="section-title">应用场景</h2>
+    <p class="section-desc">覆盖文博、文旅、教育三大核心领域</p>
+
+    <div class="scenarios">
+        <div class="scenario-card">
+            <div class="scenario-icon">🏛️</div>
+            <h3 class="scenario-title">博物馆数字化展陈</h3>
+            <ul class="scenario-list">
+                <li>互动展屏：点击文物→播放活化视频</li>
+                <li>虚拟展厅：在线3D展示+动态视频</li>
+                <li>临展宣传：新展览预告视频快速制作</li>
+            </ul>
+        </div>
+        <div class="scenario-card">
+            <div class="scenario-icon">📱</div>
+            <h3 class="scenario-title">社交媒体传播</h3>
+            <ul class="scenario-list">
+                <li>短视频矩阵：每天一件文物活化</li>
+                <li>话题营销：#文物活了、#AI看国宝</li>
+                <li>直播互动：弹幕点文物实时生成</li>
+            </ul>
+        </div>
+        <div class="scenario-card">
+            <div class="scenario-icon">🌍</div>
+            <h3 class="scenario-title">文旅融合</h3>
+            <ul class="scenario-list">
+                <li>景区导览：文物活化视频嵌入AR</li>
+                <li>文创衍生：视频→文创设计灵感</li>
+                <li>沉浸体验：活化视频+空间音频</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="cta-quote">"让每一件沉睡的文物，都被AI唤醒"</div>
+    <p class="cta-desc">
+        AI文物活化师 — 基于通义万相 Wan 2.7 的文化遗产动态影像生成Skill<br>
+        WaytoAGI「万相妙思+」快闪赛参赛作品
+    </p>
+    <div style="position: relative; z-index: 1;">
+        <span class="tag">参赛者：振一</span>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>AI文物活化师 — 让文物活起来 ✨</p>
+    <p style="margin-top: 8px;">基于 <a href="https://help.aliyun.com/zh/model-studio/" target="_blank">阿里云百炼 · 通义万相 Wan 2.7</a> 构建</p>
+    <p style="margin-top: 4px;">WaytoAGI 整活计划第十二期 · 万相妙思+ 快闪赛</p>
+</footer>
+
+</body>
+</html>
