@@ -1,0 +1,28 @@
+# 工作记忆（私有）
+.workbuddy/
+
+# 临时文件
+check_task.py
+dl_img.py
+download_niaozun.py
+download_videos.py
+_find_blocks.js
+lark_update_*.md
+lark_update_log.txt
+
+# 下载的临时图片
+niaozun.jpg
+niaozun_source.jpg
+
+# 视频生成输出目录
+*_output/
+i2v_videos/
+shanxi_videos/
+videos/
+
+# 临时数据
+shanxi_museum_videos.json
+
+# 系统文件
+Thumbs.db
+.DS_Store
